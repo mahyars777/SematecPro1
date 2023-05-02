@@ -1,54 +1,83 @@
 package org.example;
 
-public class Account {
-private int Record_Number;
-private int AccountNumber;
-private int AccountType;
-private int AccountCustomerId;
-private String AccountOpenDate;
-private int Balance;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
-    @Override
-    public String toString() {
-        return "Account{" +
-                "Record_Number=" + Record_Number +
-                ", AccountNumber=" + AccountNumber +
-                ", AccountType=" + AccountType +
-                ", AccountCustomerId=" + AccountCustomerId +
-                ", AccountOpenDate='" + AccountOpenDate + '\'' +
-                ", Balance=" + Balance +
-                '}';
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.function.Predicate;
+
+public class Account extends Thread {
+    public void Csv() throws IOException {
+        String path = "D:\\Projects\\Account.csv";
+
+        Reader reader = null;
+        try {
+            reader = Files.newBufferedReader(Paths.get(path));
+            CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT);
+            for (CSVRecord csvRecord : csvParser) {
+                Record_Number = csvRecord.getRecordNumber();
+                AccountNumber = csvRecord.get(0);
+                AccountType = csvRecord.get(1);
+                AccountCustomerId = csvRecord.get(2);
+                AccountOpenDate = csvRecord.get(3);
+                System.out.println(Record_Number + "\t" + AccountNumber + "\t" + AccountType + "\t" + AccountCustomerId + "\t" + AccountOpenDate);
+
+
+            }
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
-    public int getRecord_Number() {
+    @Override
+    public void run() {
+        try {
+            this.Csv();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Long Record_Number;
+    private String AccountNumber;
+    private String AccountType;
+    private String AccountCustomerId;
+
+    public Long getRecord_Number() {
         return Record_Number;
     }
 
-    public void setRecord_Number(int record_Number) {
+    public void setRecord_Number(Long record_Number) {
         Record_Number = record_Number;
     }
 
-    public int getAccountNumber() {
+    public String getAccountNumber() {
         return AccountNumber;
     }
 
-    public void setAccountNumber(int accountNumber) {
+    public void setAccountNumber(String accountNumber) {
         AccountNumber = accountNumber;
     }
 
-    public int getAccountType() {
+    public String getAccountType() {
         return AccountType;
     }
 
-    public void setAccountType(int accountType) {
+    public void setAccountType(String accountType) {
         AccountType = accountType;
     }
 
-    public int getAccountCustomerId() {
+    public String getAccountCustomerId() {
         return AccountCustomerId;
     }
 
-    public void setAccountCustomerId(int accountCustomerId) {
+    public void setAccountCustomerId(String accountCustomerId) {
         AccountCustomerId = accountCustomerId;
     }
 
@@ -60,11 +89,22 @@ private int Balance;
         AccountOpenDate = accountOpenDate;
     }
 
-    public int getBalance() {
+    public Long getBalance() {
         return Balance;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(Long balance) {
         Balance = balance;
     }
+
+    private String AccountOpenDate;
+    private Long Balance;
+
+    public Account() throws IOException {
+    }
+
+
 }
+
+
+
