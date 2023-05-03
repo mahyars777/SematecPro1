@@ -15,19 +15,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Main {
-    public static void main(String[] args)  {
+    public static void main(String[] args) {
+
+        Account account = null;
 
         try {
-            Account account = new Account();
-            Account account1 = new Account();
-            account.start();
-            try {
-                account.join();
-                account1.start();
+            account = new Account();
 
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            account.start();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
