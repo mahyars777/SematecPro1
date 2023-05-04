@@ -42,6 +42,7 @@ public class Account extends Thread {
                 if (AccountBalance < AccountLimit) {
                     String message = "Account Balance Is Less than account limit!" + "\t" + "for record number :" + Record_Number;
                     jsonObject.put("Message", message);
+
                     fileWriter.write(jsonObject.toJSONString());
 
 
@@ -102,6 +103,11 @@ public class Account extends Thread {
     private String AccountNumber;
     private String AccountType;
     private String AccountCustomerId;
+    private long AccountBalance;
+    private long AccountLimit;
+    private String AccountOpenDate;
+    private Long Balance;
+
 
     public long getAccountBalance() {
         return AccountBalance;
@@ -119,8 +125,7 @@ public class Account extends Thread {
         AccountLimit = Long.parseLong(accountLimit);
     }
 
-    private long AccountBalance;
-    private long AccountLimit;
+
 
     public Long getRecord_Number() {
         return Record_Number;
@@ -170,8 +175,7 @@ public class Account extends Thread {
         Balance = balance;
     }
 
-    private String AccountOpenDate;
-    private Long Balance;
+
 
     public Account() throws IOException {
     }

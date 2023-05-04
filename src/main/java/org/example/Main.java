@@ -18,13 +18,18 @@ public class Main {
     public static void main(String[] args) {
 
         Account account = null;
+        Customer customer = null;
 
         try {
             account = new Account();
-
+            customer = new Customer();
+            customer.start();
+            customer.join();
             account.start();
 
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }catch (InterruptedException e){
             throw new RuntimeException(e);
         }
 
