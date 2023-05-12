@@ -11,15 +11,14 @@ import org.json.simple.JSONObject;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDate;
 import java.util.stream.Stream;
 
 public class Account extends Thread {
     public void Csv() throws IOException {
-        String path = "D:\\Projects\\Account.csv";
-        String jpath = "D:\\Projects\\Error2.json";
+        String path = "C:\\Users\\Mahyar\\Documents\\account.csv";
+        String jpath = "C:\\Users\\Mahyar\\Documents\\Error2.json";
         boolean validation = false;
         Reader reader = null;
         FileWriter fileWriter = new FileWriter(jpath);
@@ -29,7 +28,7 @@ public class Account extends Thread {
             reader = Files.newBufferedReader(Paths.get(path));
             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT);
             JSONObject jsonObject = new JSONObject();
-            DriverManager.registerDriver(new com.microsoft.sqlserver.jdbc.SQLServerDriver());
+
 
             for (CSVRecord csvRecord : csvParser) {
                 Record_Number = csvRecord.getRecordNumber();
@@ -42,6 +41,7 @@ public class Account extends Thread {
                 if (AccountBalance < AccountLimit) {
                     String message = "Account Balance Is Less than account limit!" + "\t" + "for record number :" + Record_Number;
                     jsonObject.put("Message", message);
+
 
                     fileWriter.write(jsonObject.toJSONString());
 
@@ -56,7 +56,7 @@ public class Account extends Thread {
                     validation = true;
                 }
                 if (AccountNumber == null || AccountType == null || AccountCustomerId == null || AccountOpenDate == null || AccountBalance == 0 || AccountLimit == 0) {
-                    String message = "All fields must have value!"  + "for record number :" + Record_Number;
+                    String message = "All fields must have value!" + "for record number :" + Record_Number;
                     jsonObject.put("Message", message);
                     fileWriter.write(jsonObject.toJSONString());
                     validation = true;
@@ -69,24 +69,47 @@ public class Account extends Thread {
                     continue;
 
                 } else {
-                    //insert data to database
-                    System.out.println(Record_Number + "\t" + AccountNumber + "\t");
+                    String url = "jdbc:mysql://localhost:3306/sematec";
+                    String username = "root";
+                    String password = "22674591";
+                    Connection connection;
+                    Statement statement;
+                    ResultSet resultSet;
+                    String query;
+
+
+                    {
+                        try {
+                            connection = DriverManager.getConnection(url, username, password);
+                            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO `sematec`.`account` (`AccountNumber`, `AccountType`, `AccountCustomerID`, `Balance`, `AccountLimit`, `AccountOpenDate`) VALUES (?, ?, ?, ?, ?, ?)");
+                            preparedStatement.setString(1, AccountNumber);
+                            preparedStatement.setString(2, AccountType);
+                            preparedStatement.setLong(3, Long.parseLong(AccountCustomerId));
+                            preparedStatement.setLong(4, AccountBalance);
+                            preparedStatement.setString(5, Long.toString(AccountLimit));
+                            preparedStatement.setString(6,(AccountOpenDate));
+                            preparedStatement.executeUpdate();
+
+
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+
+
+                    }
 
 
                 }
-
 
             }
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
-        }catch (SQLException e){
+        } catch (NumberFormatException e) {
             System.out.println(e.getMessage());
+        } finally {
+            fileWriter.close();
         }
-        finally {
-           fileWriter.close();
-        }
-
     }
 
     @Override
@@ -124,7 +147,6 @@ public class Account extends Thread {
     public void setAccountLimit(String accountLimit) {
         AccountLimit = Long.parseLong(accountLimit);
     }
-
 
 
     public Long getRecord_Number() {
@@ -174,7 +196,6 @@ public class Account extends Thread {
     public void setBalance(Long balance) {
         Balance = balance;
     }
-
 
 
     public Account() throws IOException {

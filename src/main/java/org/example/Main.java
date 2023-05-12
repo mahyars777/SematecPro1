@@ -22,20 +22,21 @@ public class Main {
         Customer customer = null;
 
         try {
-            Model.connection("SELECT * FROM sematec.account");
-/*            account = new Account();
+
+            account = new Account();
             customer = new Customer();
+            OutPut outPut = new OutPut();
             customer.start();
             customer.join();
             account.start();
+            account.join();
+           outPut.start();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }catch (InterruptedException e){
-            throw new RuntimeException(e);*/
-        } catch (SQLException e) {
             throw new RuntimeException(e);
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 

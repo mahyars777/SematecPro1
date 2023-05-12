@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -17,16 +18,16 @@ import java.util.stream.Stream;
 
 public class Customer extends Thread {
 
-    public void Csv() throws Exception{
+    public void Csv() throws Exception {
         boolean validation = false;
-        try{
-            String path = "D:\\Projects\\Customer.csv";
-            String jpath = "D:\\Projects\\Error2.json";
+        try {
+            String path = "C:\\Users\\Mahyar\\Documents\\customer.csv";
+            String jpath = "C:\\Users\\Mahyar\\Documents\\Error2.json";
             Reader reader = Files.newBufferedReader(Paths.get(path));
             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT);
             JSONObject jsonObject = new JSONObject();
             FileWriter fileWriter = new FileWriter(jpath);
-            for(CSVRecord csvRecord : csvParser){
+            for (CSVRecord csvRecord : csvParser) {
                 RecordNumber = csvRecord.getRecordNumber();
                 CustomerID = csvRecord.get(0);
                 CustomerName = csvRecord.get(1);
@@ -39,18 +40,18 @@ public class Customer extends Thread {
                 int year = localDate.getYear();
                 LocalDateTime now = LocalDateTime.now();
 
-                if (CustomerNationalId.length() < 10){
+                if (CustomerNationalId.length() < 10) {
                     String message = "National Id must be at least 10 digits!";
-                    jsonObject.put("RecordNumber",RecordNumber);
-                    jsonObject.put("Error Description:",message);
+                    jsonObject.put("RecordNumber", RecordNumber);
+                    jsonObject.put("Error Description:", message);
                     jsonObject.put("Error Date:", now);
                     fileWriter.write(jsonObject.toJSONString());
                     validation = true;
                 }
-                if (year<1995){
+                if (year < 1995) {
                     String message = "Your birth year must be above 1995!";
-                    jsonObject.put("RecordNumber",RecordNumber);
-                    jsonObject.put("Error Description:",message);
+                    jsonObject.put("RecordNumber", RecordNumber);
+                    jsonObject.put("Error Description:", message);
                     jsonObject.put("Error Date:", now);
                     fileWriter.write(jsonObject.toJSONString());
                     validation = true;
@@ -63,23 +64,45 @@ public class Customer extends Thread {
                     continue;
 
                 } else {
-                    //insert data to database
-                    System.out.println(RecordNumber + "\t" + CustomerName + "\t");
+                    String url = "jdbc:mysql://localhost:3306/sematec";
+                    String username = "root";
+                    String password = "22674591";
+                    Connection connection;
+                    Statement statement;
+                    ResultSet resultSet;
+                    String query;
+
+
+                    {
+                        try {
+                            connection = DriverManager.getConnection(url, username, password);
+                            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO `sematec`.`customers` (`CustomerName`, `CustomerSurname`, `CustomerAddress`, `CustomerZipcode`, `CustomerNationalID`, `CustomerBirthdate`, `CustomerID`) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                            preparedStatement.setString(1,CustomerName);
+                            preparedStatement.setString(2,CustomerSurname);
+                            preparedStatement.setString(3,CustomerAddress);
+                            preparedStatement.setString(4,CustomerZipcode);
+                            preparedStatement.setString(5,CustomerNationalId);
+                            preparedStatement.setString(6,CustomerBirthDate);
+                            preparedStatement.setString(7,CustomerID);
+                            preparedStatement.executeUpdate();
+
+
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+
+
+                    }
 
 
                 }
 
-
-
-
             }
 
-        }catch (IOException e){
+
+        } catch(IOException e){
             System.out.println(e.getMessage());
         }
-
-
-
     }
 
     @Override
@@ -87,7 +110,7 @@ public class Customer extends Thread {
         try {
             this.Csv();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());;
         }
     }
 
@@ -113,8 +136,6 @@ public class Customer extends Thread {
                 ", CustomerBirthDate='" + CustomerBirthDate + '\'' +
                 '}';
     }
-
-
 
 
 }
